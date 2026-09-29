@@ -1,0 +1,35 @@
+
+
+services:
+  app:
+    build: ./app
+    container_name: app_server
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=app_db
+    depends_on:
+      - db
+    volumes:
+      # Монтируем JSON-файл, чтобы он сохранялся даже при перезапуске контейнера app
+      - ./app/latest_data.json:/app/latest_data.json
+
+  db:
+    build: ./db
+    container_name: db_server
+    ports:
+      - "5432:5432" # Открываем для DBeaver
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=app_db
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

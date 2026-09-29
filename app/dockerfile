@@ -1,0 +1,18 @@
+FROM node:20-alpine
+WORKDIR /app
+
+# Копируем зависимости
+COPY package.json package-lock.json* ./
+RUN npm install
+
+# Копируем весь код
+COPY . .
+
+# Собираем React
+RUN npm run build
+
+# Открываем порт
+EXPOSE 8080
+
+# Запускаем Node.js сервер (который отдаст и статику, и API)
+CMD ["node", "server.js"]
